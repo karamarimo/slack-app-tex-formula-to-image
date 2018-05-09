@@ -9,10 +9,20 @@ const config = require('./config.json')
 
 // slack app verification token (used for initial verification request)
 // and bot token (used to post messages)
-const {appVerifToken, botToken} = config
+const {appVerifyToken, botToken} = config
 
 const texRegex = /\$([^$]+)\$/
 const slackUrl = "https://slack.com/api/files.upload"
+
+// log out any axios request
+axios.interceptors.request.use(function (config) {
+  // Do something before request is sent
+  console.log(config)
+  return config
+}, function (error) {
+  // Do something with request error
+  return error
+})
 
 const app = new Koa()
 app.use(bodyParser())
@@ -28,7 +38,7 @@ app.use(async (ctx, next) => {
 
   if (body.type === "url_verification" && method === "POST") {
     const { token, challenge } = body
-    if (token === appVerifToken && challenge) {
+    if (token === appVerifyToken && challenge) {
       ctx.body = {challenge}
     } else {
       ctx.throw(400, 'unexpected request')
@@ -46,41 +56,34 @@ app.use(async (ctx, next) => {
     console.log(text)
     if (matched) {
       const tex = matched[1]
-      mj.typeset({
-        math: tex,
-        format: "TeX", // or "inline-TeX", "MathML"
-        svg: true,      // or svg:true, or html:true
-      }).then(data => {
-        console.log(data.svg)
-        return svgToPngBuffer(data.svg)
-      }).then(buffer => {
+      try {
+        const buffer = await texToPngBuffer(tex)
         console.log(buffer)
-        ctx.body = buffer
-        // const fm = new FormData()
-        // fm.append("file", buffer)
-        // fm.append("token", botToken)
-        // fm.append("channels", channel)
-        // fm.append("filetype", "png")
+        const fm = new FormData()
+        fm.append("file", buffer)
+        fm.append("token", botToken)
+        fm.append("channels", channel)
+        fm.append("filetype", "png")
 
-        // return axios({
-        //   url: slackUrl,
-        //   method: 'POST',
-        //   headers: {
-        //     "Content-type": "multipart/form-data"
-        //   },
-        //   data: fm,
-        // }).then(response => {
-        //   if (response.data.ok) {
-        //     console.log("upload success")
-        //   } else {
-        //     console.error(response.data)
-        //   }
-        // }).catch(err => {
-        //   console.error(err)
-        // })
-      }).catch(err => {
+        axios({
+          url: slackUrl,
+          method: 'POST',
+          headers: {
+            "Content-type": "multipart/form-data"
+          },
+          data: fm,
+        }).then(response => {
+          if (response.data.ok) {
+            console.log("upload success")
+          } else {
+            console.error(response.data)
+          }
+        }).catch(err => {
+          console.error(err)
+        })
+      } catch (err) {
         ctx.throw(200, err)
-      })
+      }
     } else {
       ctx.throw(400, "tex parameter required")
     }
@@ -92,6 +95,16 @@ app.use(async (ctx, next) => {
 app.use(ctx => {
   ctx.throw(400, "Page Not Found")
 })
+
+async function texToPngBuffer(tex) {
+  const result = await mj.typeset({
+    math: tex,
+    format: "TeX",
+    svg: true,
+  })
+
+  return await svgToPngBuffer(result.svg)
+}
 
 function svgToPngBuffer(svg) {
   return new Promise((resolve, reject) => {
