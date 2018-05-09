@@ -1,0 +1,17 @@
+{
+    "name": "node-cloud-function-slack-app-tex-formula-to-image",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+        "run": "node index.1.js"
+    },
+    "license": "MIT",
+    "dependencies": {
+        "axios": "^0.18.0",
+        "form-data": "^2.3.2",
+        "gm": "^1.23.1",
+        "koa": "^2.5.1",
+        "mathjax-node": "^2.1.0",
+        "mathjax-node-svg2png": "^2.0.0"
+    }
+}
