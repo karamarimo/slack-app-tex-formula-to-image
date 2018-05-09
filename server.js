@@ -13,6 +13,7 @@ const {appVerifyToken, botToken} = config
 
 const texRegex = /\$([^$]+)\$/
 const slackUrl = "https://slack.com/api/files.upload"
+const svgXmlDeclaration = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
 
 // log out any axios request
 axios.interceptors.request.use(function (config) {
@@ -107,8 +108,8 @@ async function texToPngBuffer(tex) {
     format: "TeX",
     svg: true,
   })
-
-  return await svgToPngBuffer(result.svg)
+  const svgString = svgXmlDeclaration + result.svg
+  return await svgToPngBuffer(svgString)
 }
 
 function svgToPngBuffer(svg) {
