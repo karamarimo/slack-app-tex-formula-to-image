@@ -5,11 +5,11 @@ const gm = require("gm").subClass({imageMagick: true})
 const Koa = require('koa')
 const bodyParser = require('koa-bodyparser')
 
-// slack app verification token (used for initial verification request)
-const appVerifToken = "cDMuus1PtRxMYAiMzgThmarg"
-const botToken = process.argv0
+const config = require('./config.json')
 
-if (!botToken) throw new Error("specify a slack token")
+// slack app verification token (used for initial verification request)
+// and bot token (used to post messages)
+const {appVerifToken, botToken} = config
 
 const texRegex = /\$([^$]+)\$/
 const slackUrl = "https://slack.com/api/files.upload"
