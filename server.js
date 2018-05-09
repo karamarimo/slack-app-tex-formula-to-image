@@ -37,6 +37,7 @@ app.use(async (ctx, next) => {
   const {url, body, method, query} = ctx.request
 
   if (body.type === "url_verification" && method === "POST") {
+    console.log("verification")
     const { token, challenge } = body
     if (token === appVerifyToken && challenge) {
       ctx.body = {challenge}
@@ -50,6 +51,7 @@ app.use(async (ctx, next) => {
 
 app.use(async (ctx, next) => {
   if (ctx.request.body.type === "event_callback" && ctx.method === "POST" && ctx.query.tex) {
+    console.log("event callback")
     // const { text, user, channel } = body.event
     const text = ctx.query.tex
     const matched = texRegex.exec(text)
