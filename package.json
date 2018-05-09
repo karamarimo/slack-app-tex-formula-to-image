@@ -11,7 +11,8 @@
         "gm": "^1.23.1",
         "koa": "^2.5.1",
         "koa-bodyparser": "^4.2.0",
+        "mathjax-node": "^2.1.0",
         "request-promise-native": "^1.0.5",
-        "mathjax-node-svg2png": "^2.0.0"
+        "svg2png": "^4.1.1"
     }
 }

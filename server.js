@@ -1,11 +1,15 @@
 const mj = require("mathjax-node")
 const request = require("request-promise-native")
 const FormData = require('form-data')
-const math2png = require("mathjax-node-svg2png")
+const mjAPI = require("mathjax-node")
+const svg2png = require("svg2png")
 const Koa = require('koa')
 const bodyParser = require('koa-bodyparser')
 
 const config = require('./config.json')
+
+mjAPI.config({ })
+mjAPI.start()
 
 // slack app verification token (used for initial verification request)
 // and bot token (used to post messages)
@@ -51,7 +55,11 @@ app.use(async (ctx, next) => {
     if (matched) {
       const tex = matched[1]
       try {
-        const buffer = await math2png(tex)
+        const buffer = await mjAPI.typeset({
+          math: tex,
+          format: "TeX",
+          png: true
+        })
         // console.log(buffer)
         // const fm = new FormData()
         // fm.append("file", buffer)
@@ -102,22 +110,15 @@ app.use(ctx => {
 })
 
 async function texToPngBuffer(tex) {
-  const result = await mj.typeset({
+  const result = await mjAPI.typeset({
     math: tex,
     format: "TeX",
-    svg: true,
+    png: true,
   })
-  const svgString = svgXmlDeclaration + result.svg
-  return await svgToPngBuffer(svgString)
+  // const svgString = svgXmlDeclaration + result.svg
+  return await svg2png(result)
 }
 
-function svgToPngBuffer(svg) {
-  return gmToBuffer(gm(Buffer.from(svg), 'svg.svg').setFormat("png"))
-}
-
-function svgToPngStream(svg) {
-  return gm(Buffer.from(svg), 'svg.svg').setFormat("png").stream()
-}
 
 function gmToBuffer (data) {
   return new Promise((resolve, reject) => {
