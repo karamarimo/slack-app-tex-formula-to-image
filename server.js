@@ -109,10 +109,10 @@ async function texToPngBuffer(tex) {
   const result = await mjAPI.typeset({
     math: tex,
     format: "TeX",
-    png: true,
+    svg: true,
   })
   // const svgString = svgXmlDeclaration + result.svg
-  return await svg2png(result.png)
+  return await svg2png(result.svg)
 }
 
 
