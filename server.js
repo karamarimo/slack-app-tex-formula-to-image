@@ -112,7 +112,7 @@ async function texToPngBuffer(tex) {
 }
 
 function svgToPngBuffer(svg) {
-  return gmToBuffer(gm(Buffer.from(svg)).setFormat("png"))
+  return gmToBuffer(gm(Buffer.from(svg), 'svg.svg').setFormat("png"))
 }
 
 function gmToBuffer (data) {
