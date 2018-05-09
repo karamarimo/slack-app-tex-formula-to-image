@@ -112,7 +112,7 @@ async function texToPngBuffer(tex) {
     svg: true,
   })
   // const svgString = svgXmlDeclaration + result.svg
-  return await svg2png(result.svg)
+  return await svg2png(result.svg, { width: 300})
 }
 
 
