@@ -7,11 +7,11 @@
     },
     "license": "MIT",
     "dependencies": {
-        "axios": "^0.18.0",
         "form-data": "^2.3.2",
         "gm": "^1.23.1",
         "koa": "^2.5.1",
         "koa-bodyparser": "^4.2.0",
-        "mathjax-node": "^2.1.0"
+        "mathjax-node": "^2.1.0",
+        "request-promise-native": "^1.0.5"
     }
 }

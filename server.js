@@ -1,5 +1,5 @@
 const mj = require("mathjax-node")
-const axios = require("axios")
+const request = require("request-promise-native")
 const FormData = require('form-data')
 const gm = require("gm").subClass({imageMagick: true})
 const Koa = require('koa')
@@ -14,16 +14,6 @@ const {appVerifyToken, botToken} = config
 const texRegex = /\$([^$]+)\$/
 const slackUrl = "https://slack.com/api/files.upload"
 const svgXmlDeclaration = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
-
-// log out any axios request
-axios.interceptors.request.use(function (config) {
-  // Do something before request is sent
-  console.log(config)
-  return config
-}, function (error) {
-  // Do something with request error
-  return error
-})
 
 const app = new Koa()
 app.use(bodyParser())
@@ -51,7 +41,7 @@ app.use(async (ctx, next) => {
 })
 
 app.use(async (ctx, next) => {
-  const {request: {body: {type, event: {text, channel, user}}}, method} = ctx
+  const {request: {body: {type, event: {text, channel, user} = {}} = {}} = {}, method} = ctx
   if (type === "event_callback" && method === "POST" && text) {
     ctx.status = 200
     ctx.res.end()
@@ -62,25 +52,28 @@ app.use(async (ctx, next) => {
       const tex = matched[1]
       try {
         const buffer = await texToPngBuffer(tex)
-        console.log(buffer)
-        const fm = new FormData()
-        fm.append("file", buffer)
-        fm.append("token", botToken)
-        fm.append("channels", channel)
-        fm.append("filetype", "png")
+        // console.log(buffer)
+        // const fm = new FormData()
+        // fm.append("file", buffer)
+        // fm.append("token", botToken)
+        // fm.append("channels", channel)
+        // fm.append("filetype", "png")
 
-        await axios({
+        await request({
           url: slackUrl,
           method: 'POST',
-          headers: {
-            "Content-type": "multipart/form-data"
+          formData: {
+            file: buffer,
+            token: botToken,
+            title: "formula image",
+            channels: channel,
+            filetype: "png",
           },
-          data: fm,
-        }).then(response => {
-          if (response.data.ok) {
+        }).then(body => {
+          if (body.ok) {
             console.log("upload success")
           } else {
-            console.error(response.data)
+            console.error(body)
           }
         }).catch(err => {
           console.error("request to slack failed")
