@@ -63,11 +63,17 @@ app.use(async (ctx, next) => {
           url: slackUrl,
           method: 'POST',
           formData: {
-            file: stream,
             token: botToken,
             title: "formula image",
             channels: channel,
             filetype: "png",
+            file: {
+              value: stream,
+              options: {
+                filename: 'formula.png',
+                contentType: 'image/png'
+              }
+            },
           },
         }).then(body => {
           if (body.ok) {
