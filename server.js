@@ -51,7 +51,7 @@ app.use(async (ctx, next) => {
     if (matched) {
       const tex = matched[1]
       try {
-        const stream = await svgToPngStream(tex)
+        const buffer = await svgToPngBuffer(tex)
         // console.log(buffer)
         // const fm = new FormData()
         // fm.append("file", buffer)
@@ -68,7 +68,7 @@ app.use(async (ctx, next) => {
             channels: channel,
             filetype: "png",
             file: {
-              value: stream,
+              value: buffer,
               options: {
                 filename: 'formula.png',
                 contentType: 'image/png'
