@@ -7,7 +7,9 @@ const bodyParser = require('koa-bodyparser')
 
 // slack app verification token (used for initial verification request)
 const appVerifToken = "cDMuus1PtRxMYAiMzgThmarg"
-const botToken = "xoxb-341040671266-vAAnzrkAg1FSSGzwA3agm8zd"
+const botToken = process.argv0
+
+if (!botToken) throw new Error("specify a slack token")
 
 const texRegex = /\$([^$]+)\$/
 const slackUrl = "https://slack.com/api/files.upload"
