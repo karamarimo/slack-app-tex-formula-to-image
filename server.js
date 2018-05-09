@@ -51,7 +51,7 @@ app.use(async (ctx, next) => {
     if (matched) {
       const tex = matched[1]
       try {
-        const buffer = await texToPngBuffer(tex)
+        const stream = await texToPngStream(tex)
         // console.log(buffer)
         // const fm = new FormData()
         // fm.append("file", buffer)
@@ -63,7 +63,7 @@ app.use(async (ctx, next) => {
           url: slackUrl,
           method: 'POST',
           formData: {
-            file: buffer,
+            file: stream,
             token: botToken,
             title: "formula image",
             channels: channel,
@@ -107,6 +107,10 @@ async function texToPngBuffer(tex) {
 
 function svgToPngBuffer(svg) {
   return gmToBuffer(gm(Buffer.from(svg), 'svg.svg').setFormat("png"))
+}
+
+function svgToPngStream(svg) {
+  return gm(Buffer.from(svg), 'svg.svg').setFormat("png").stream()
 }
 
 function gmToBuffer (data) {
