@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "main": "index.js",
     "scripts": {
-        "run": "node index.1.js"
+        "start": "node index.1.js"
     },
     "license": "MIT",
     "dependencies": {
@@ -11,6 +11,7 @@
         "form-data": "^2.3.2",
         "gm": "^1.23.1",
         "koa": "^2.5.1",
+        "koa-bodyparser": "^4.2.0",
         "mathjax-node": "^2.1.0",
         "mathjax-node-svg2png": "^2.0.0"
     }
