@@ -50,10 +50,10 @@ app.use(async (ctx, next) => {
 })
 
 app.use(async (ctx, next) => {
-  if (ctx.request.body.type === "event_callback" && ctx.method === "POST" && ctx.query.tex) {
+  const {request: {body: {type, event: {text, channel, user}}}, method} = ctx
+  if (type === "event_callback" && method === "POST" && text) {
     console.log("event callback")
-    // const { text, user, channel } = body.event
-    const text = ctx.query.tex
+    // const text = ctx.query.tex
     const matched = texRegex.exec(text)
     console.log(text)
     if (matched) {
