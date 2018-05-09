@@ -51,7 +51,7 @@ app.use(async (ctx, next) => {
     if (matched) {
       const tex = matched[1]
       try {
-        const stream = await texToPngStream(tex)
+        const stream = await svgToPngStream(tex)
         // console.log(buffer)
         // const fm = new FormData()
         // fm.append("file", buffer)
