@@ -22,11 +22,11 @@ const svgXmlDeclaration = '<?xml version="1.0" encoding="UTF-8" standalone="yes"
 const app = new Koa()
 app.use(bodyParser())
 
-app.use(async (ctx, next) => {
-  const {url, body, method, query} = ctx.request
-  console.log({body, method, query, url})
-  await next()
-})
+// app.use(async (ctx, next) => {
+//   const {url, body, method, query} = ctx.request
+//   console.log({body, method, query, url})
+//   await next()
+// })
 
 app.use(async (ctx, next) => {
   const {url, body, method, query} = ctx.request
@@ -55,12 +55,8 @@ app.use(async (ctx, next) => {
     if (matched) {
       const tex = matched[1]
       try {
-        const buffer = await mjAPI.typeset({
-          math: tex,
-          format: "TeX",
-          png: true
-        })
-        // console.log(buffer)
+        const buffer = await texToPngBuffer(tex)
+        console.log(buffer)
         // const fm = new FormData()
         // fm.append("file", buffer)
         // fm.append("token", botToken)
