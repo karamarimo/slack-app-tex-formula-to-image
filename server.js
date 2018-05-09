@@ -1,7 +1,7 @@
 const mj = require("mathjax-node")
 const request = require("request-promise-native")
 const FormData = require('form-data')
-const gm = require("gm").subClass({imageMagick: true})
+const math2png = require("mathjax-node-svg2png")
 const Koa = require('koa')
 const bodyParser = require('koa-bodyparser')
 
@@ -51,7 +51,7 @@ app.use(async (ctx, next) => {
     if (matched) {
       const tex = matched[1]
       try {
-        const buffer = await texToPngBuffer(tex)
+        const buffer = await math2png(tex)
         // console.log(buffer)
         // const fm = new FormData()
         // fm.append("file", buffer)
