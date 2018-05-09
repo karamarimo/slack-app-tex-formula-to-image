@@ -52,10 +52,11 @@ app.use(async (ctx, next) => {
 app.use(async (ctx, next) => {
   const {request: {body: {type, event: {text, channel, user}}}, method} = ctx
   if (type === "event_callback" && method === "POST" && text) {
+    ctx.status = 200
+    ctx.res.end()
     console.log("event callback")
     // const text = ctx.query.tex
     const matched = texRegex.exec(text)
-    console.log(text)
     if (matched) {
       const tex = matched[1]
       try {
@@ -67,7 +68,7 @@ app.use(async (ctx, next) => {
         fm.append("channels", channel)
         fm.append("filetype", "png")
 
-        axios({
+        await axios({
           url: slackUrl,
           method: 'POST',
           headers: {
@@ -81,13 +82,15 @@ app.use(async (ctx, next) => {
             console.error(response.data)
           }
         }).catch(err => {
+          console.error("request to slack failed")
           console.error(err)
         })
       } catch (err) {
-        ctx.throw(200, err)
+        console.error("failed to convert")
+        console.error(err)
       }
     } else {
-      ctx.throw(400, "tex parameter required")
+      console.log("no formula found")
     }
   } else {
     await next()
