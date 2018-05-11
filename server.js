@@ -16,7 +16,8 @@ mjAPI.start()
 const {appVerifyToken, botToken} = config
 
 const texRegex = /\$([^$]+)\$/
-const slackUrl = "https://slack.com/api/files.upload"
+const slackUploadUrl = "https://slack.com/api/files.upload"
+const slackPostUrl = "https://slack.com/api/chat.postMessage"
 const svgXmlDeclaration = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
 
 const app = new Koa()
@@ -45,8 +46,8 @@ app.use(async (ctx, next) => {
 })
 
 app.use(async (ctx, next) => {
-  const {request: {body: {type, event: {text, channel, user} = {}} = {}} = {}, method} = ctx
-  if (type === "event_callback" && method === "POST" && text) {
+  const {request: {body: {type, event: {text, channel, user} = {}} = {}} = {}, token} = ctx
+  if (token === appVerifyToken && type === "event_callback" && method === "POST" && text && channel) {
     ctx.status = 200
     ctx.res.end()
     console.log("event callback")
@@ -56,33 +57,13 @@ app.use(async (ctx, next) => {
       const tex = matched[1]
       try {
         const buffer = await texToPngBuffer(tex)
-        console.log(buffer)
-        // const fm = new FormData()
-        // fm.append("file", buffer)
-        // fm.append("token", botToken)
-        // fm.append("channels", channel)
-        // fm.append("filetype", "png")
+        // console.log(buffer)
 
-        await request({
-          url: slackUrl,
-          method: 'POST',
-          formData: {
-            token: botToken,
-            title: "formula image",
-            channels: channel,
-            filetype: "png",
-            file: {
-              value: buffer,
-              options: {
-                filename: 'formula.png',
-                contentType: 'image/png'
-              }
-            },
-          },
-        }).then(body => {
+        await sendImage(buffer, channel).then(body => {
           if (body.ok) {
             console.log("upload success")
           } else {
+            console.error("upload failed")
             console.error(body)
           }
         }).catch(err => {
@@ -92,6 +73,11 @@ app.use(async (ctx, next) => {
       } catch (err) {
         console.error("failed to convert")
         console.error(err)
+        sendText(`<@${user}> Converting to image failed. Might be due to invalid format.`)
+        .catch(err => {
+          console.error("notifying convert failure failed")
+          console.error(err)
+        })
       }
     } else {
       console.log("no formula found")
@@ -104,6 +90,39 @@ app.use(async (ctx, next) => {
 app.use(ctx => {
   ctx.throw(400, "Page Not Found")
 })
+
+function sendImage(buffer, channel) {
+  return request({
+    url: slackUploadUrl,
+    method: 'POST',
+    formData: {
+      token: botToken,
+      title: "formula image",
+      channels: channel,
+      filetype: "png",
+      file: {
+        value: buffer,
+        options: {
+          filename: 'formula.png',
+          contentType: 'image/png'
+        }
+      },
+    },
+  })
+}
+
+function sendText(text, channel) {
+  return request({
+    url: slackPostUrl,
+    method: 'POST',
+    form: {
+      token: botToken,
+      title: "formula image",
+      channel: channel,
+      text,
+    },
+  })
+}
 
 async function texToPngBuffer(tex) {
   const result = await mjAPI.typeset({
