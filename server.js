@@ -23,11 +23,11 @@ const svgXmlDeclaration = '<?xml version="1.0" encoding="UTF-8" standalone="yes"
 const app = new Koa()
 app.use(bodyParser())
 
-// app.use(async (ctx, next) => {
-//   const {url, body, method, query} = ctx.request
-//   console.log({body, method, query, url})
-//   await next()
-// })
+app.use(async (ctx, next) => {
+  const {url, body, method, query} = ctx.request
+  console.log({url, body, method})
+  await next()
+})
 
 app.use(async (ctx, next) => {
   const {url, body, method, query} = ctx.request
@@ -89,6 +89,7 @@ app.use(async (ctx, next) => {
 
 app.use(ctx => {
   ctx.throw(400, "Page Not Found")
+  console.log("page not found")
 })
 
 function sendImage(buffer, channel) {
