@@ -46,7 +46,7 @@ app.use(async (ctx, next) => {
 })
 
 app.use(async (ctx, next) => {
-  const {request: {body: {type, event: {text, channel, user} = {}} = {}} = {}, token} = ctx
+  const {request: {body: {type, event: {text, channel, user} = {}} = {}} = {}, method, token} = ctx
   if (token === appVerifyToken && type === "event_callback" && method === "POST" && text && channel) {
     ctx.status = 200
     ctx.res.end()
@@ -88,8 +88,8 @@ app.use(async (ctx, next) => {
 })
 
 app.use(ctx => {
-  ctx.throw(400, "Page Not Found")
   console.log("page not found")
+  ctx.throw(400, "Page Not Found")
 })
 
 function sendImage(buffer, channel) {
