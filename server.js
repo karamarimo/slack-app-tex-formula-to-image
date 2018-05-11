@@ -109,7 +109,7 @@ function sendImage(buffer, channel) {
         }
       },
     },
-  })
+  }).then(res => JSON.parse(res.body))
 }
 
 function sendText(text, channel) {
@@ -122,7 +122,7 @@ function sendText(text, channel) {
       channel: channel,
       text,
     },
-  })
+  }).then(res => JSON.parse(res.body))
 }
 
 async function texToPngBuffer(tex) {
