@@ -46,7 +46,7 @@ app.use(async (ctx, next) => {
 })
 
 app.use(async (ctx, next) => {
-  const {request: {body: {type, event: {text, channel, user} = {}} = {}} = {}, method, token} = ctx
+  const {request: {body: {type, token, event: {text, channel, user} = {}} = {}} = {}, method} = ctx
   if (token === appVerifyToken && type === "event_callback" && method === "POST" && text && channel) {
     ctx.status = 200
     ctx.res.end()
